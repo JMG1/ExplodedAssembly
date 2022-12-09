@@ -27,7 +27,7 @@ import os
 import time
 import FreeCAD
 import Part
-
+import RecordPlayVideo as rpv # Inclusion to trigger recording
 
 # Container python folder 'ExplodedAssembly'
 class ExplodedAssemblyFolder:
@@ -360,6 +360,15 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
             traj = EAFolder[r]
             # set current stop point
             EA.CurrentTrajectory = r-1
+            
+            
+        # Inclusion to trigger recording
+        if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
+            CL = FreeCAD.ActiveDocument.Clapperboard
+            if CL.Cam_3OnRec == True:
+                rpv.runRecordCamera()   
+        # End of inclusion             
+            
 
         # highligh current trajectory
         FreeCAD.Gui.Selection.addSelection(traj)
@@ -395,6 +404,16 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
                     obj.Placement = incremental_placement.multiply(obj.Placement)
 
                 FreeCAD.Gui.updateGui()
+ 
+                
+                # Inclusion to trigger recording
+                if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
+                    CL = FreeCAD.ActiveDocument.Clapperboard
+                    if CL.Cam_3OnRec == True:
+                        rpv.runRecordCamera()  
+                # End of inclusion 
+                
+                
                 time.sleep(traj.AnimationStepTime)
 
         else:
@@ -432,6 +451,15 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
     EA = FreeCAD.ActiveDocument.ExplodedAssembly
     # toggle InAnimation to activate icons deactivated before
     EA.InAnimation = False
+  
+    
+    # Inclusion to reset recording
+    if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
+        CL = FreeCAD.ActiveDocument.Clapperboard
+        CL.Cam_3OnRec = False
+    # End of inclusion    
+    
+    
     # set CurrentTrajectory number
     if not(animation_paused):
         if direction == 'forward' and end == 0:
