@@ -372,7 +372,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
             # set current stop point
             EA.CurrentTrajectory = r-1
             
-        # Inclusion to trigger recording the first frame
+        # Inclusion to trigger the first frame recording
         if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
             CL = FreeCAD.ActiveDocument.Clapperboard
             if CL.Cam_3OnRec == True:
