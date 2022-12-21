@@ -27,7 +27,6 @@ import os
 import time
 import FreeCAD
 import Part
-import RecordPlayVideo as rpv # Inclusion to trigger recording
 
 # Container python folder 'ExplodedAssembly'
 class ExplodedAssemblyFolder:
@@ -344,6 +343,12 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
         traj_iterator = range(number_of_trajectories-1, -1, -1)
 
     animation_paused = False
+    
+    # Inclusion to import the Movie module only if it already exists a Clapperboard  
+    if 'Clapperboard' in FreeCAD.ActiveDocument.Content: 
+        import RecordPlayVideo as rpv    
+    # End of inclusion 
+    
     for r in traj_iterator:
         # break animation loop if not InAnimation (this is where pause animation takes place):
         EA = FreeCAD.ActiveDocument.ExplodedAssembly
@@ -367,7 +372,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
             # set current stop point
             EA.CurrentTrajectory = r-1
             
-        # Inclusion to trigger recording
+        # Inclusion to trigger recording the first frame
         if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
             CL = FreeCAD.ActiveDocument.Clapperboard
             if CL.Cam_3OnRec == True:
@@ -409,7 +414,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
 
                 FreeCAD.Gui.updateGui()
                 
-                # Inclusion to trigger recording
+                # Inclusion to trigger recording frames
                 if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
                     CL = FreeCAD.ActiveDocument.Clapperboard
                     if CL.Cam_3OnRec == True:
