@@ -344,22 +344,19 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
 
     animation_paused = False
     
-    # Inclusion to import the Movie module only if it already exists a Clapperboard  
-    if 'Clapperboard' in FreeCAD.ActiveDocument.Content: 
-        import RecordPlayVideo as rpv    
-    # End of inclusion 
+    # Inclusion to import the Connection module 
+    if 'MovieCamera' in FreeCAD.ActiveDocument.Content: 
+        import Connection as co
+        MC_presence = True
+    else:
+        MC_presence = False              
+    # End of inclusion
     
     for r in traj_iterator:
         # break animation loop if not InAnimation (this is where pause animation takes place):
         EA = FreeCAD.ActiveDocument.ExplodedAssembly
         if not(EA.InAnimation):
-            animation_paused = True
-            
-            # Inclusion to reset recording
-            if 'Clapperboard' in FreeCAD.ActiveDocument.Content:          
-                rpv.stopRecordCamera()
-            # End of inclusion             
-            
+            animation_paused = True         
             break
 
         if direction == 'forward':
@@ -371,14 +368,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
             traj = EAFolder[r]
             # set current stop point
             EA.CurrentTrajectory = r-1
-            
-        # Inclusion to trigger the first frame recording
-        if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
-            CL = FreeCAD.ActiveDocument.Clapperboard
-            if CL.Cam_3OnRec == True:
-                rpv.runRecordCamera()   
-        # End of inclusion             
-
+ 
         # highligh current trajectory
         FreeCAD.Gui.Selection.addSelection(traj)
         # If trajectory is a bolt group or simple group:
@@ -412,14 +402,13 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
                     incremental_placement = FreeCAD.Placement(obj_base, obj_rot, obj_rot_center)
                     obj.Placement = incremental_placement.multiply(obj.Placement)
 
-                FreeCAD.Gui.updateGui()
-                
-                # Inclusion to trigger recording frames
-                if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
-                    CL = FreeCAD.ActiveDocument.Clapperboard
-                    if CL.Cam_3OnRec == True:
-                        rpv.runRecordCamera()  
-                # End of inclusion                
+
+                # Inclusion to connects with Movie Camera module
+                if MC_presence == True:
+                    co.connectionEA()             
+                # End of inclusion                    
+                    
+                FreeCAD.Gui.updateGui()              
                 
                 time.sleep(traj.AnimationStepTime)
 
@@ -457,12 +446,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
     # set pointer to current trajectory index
     EA = FreeCAD.ActiveDocument.ExplodedAssembly
     # toggle InAnimation to activate icons deactivated before
-    EA.InAnimation = False
-    
-    # Inclusion to reset recording
-    if 'Clapperboard' in FreeCAD.ActiveDocument.Content:
-        rpv.stopRecordCamera()
-    # End of inclusion     
+    EA.InAnimation = False    
     
     # set CurrentTrajectory number
     if not(animation_paused):
