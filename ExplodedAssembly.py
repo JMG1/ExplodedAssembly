@@ -28,6 +28,7 @@ import time
 import FreeCAD
 import Part
 
+
 # Container python folder 'ExplodedAssembly'
 class ExplodedAssemblyFolder:
     def __init__(self, obj):
@@ -350,13 +351,13 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
         MC_presence = True
     else:
         MC_presence = False              
-    # End of inclusion
+    # End of inclusion    
     
     for r in traj_iterator:
         # break animation loop if not InAnimation (this is where pause animation takes place):
         EA = FreeCAD.ActiveDocument.ExplodedAssembly
         if not(EA.InAnimation):
-            animation_paused = True         
+            animation_paused = True
             break
 
         if direction == 'forward':
@@ -368,7 +369,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
             traj = EAFolder[r]
             # set current stop point
             EA.CurrentTrajectory = r-1
- 
+
         # highligh current trajectory
         FreeCAD.Gui.Selection.addSelection(traj)
         # If trajectory is a bolt group or simple group:
@@ -406,10 +407,9 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
                 # Inclusion to connects with Movie Camera module
                 if MC_presence == True:
                     co.connectionEA()             
-                # End of inclusion                    
-                    
-                FreeCAD.Gui.updateGui()              
-                
+                # End of inclusion 
+
+                FreeCAD.Gui.updateGui()
                 time.sleep(traj.AnimationStepTime)
 
         else:
@@ -446,8 +446,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
     # set pointer to current trajectory index
     EA = FreeCAD.ActiveDocument.ExplodedAssembly
     # toggle InAnimation to activate icons deactivated before
-    EA.InAnimation = False    
-    
+    EA.InAnimation = False
     # set CurrentTrajectory number
     if not(animation_paused):
         if direction == 'forward' and end == 0:
