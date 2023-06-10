@@ -319,7 +319,15 @@ def resetPlacement():
             rot = FreeCAD.Rotation(plm[1][0], plm[1][1], plm[1][2], plm[1][3])
             obj.Placement = FreeCAD.Placement(base, rot)
 
-
+# Inclusion to import the Connection module
+MC_CONNECTION = False
+def connectionMC(option = False):
+    global MC_CONNECTION
+    if option == True:
+        MC_CONNECTION = True
+    else:
+        MC_CONNECTION = False
+# End of inclusion
 
 def runAnimation(start=0, end=0, mode='complete', direction='forward'):
     # runs the animation from a start step number to the end step number
@@ -344,15 +352,7 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
         traj_iterator = range(number_of_trajectories-1, -1, -1)
 
     animation_paused = False
-    
-    # Inclusion to import the Connection module 
-    if 'MovieCamera' in FreeCAD.ActiveDocument.Content: 
-        import Connection as co
-        MC_presence = True
-    else:
-        MC_presence = False              
-    # End of inclusion    
-    
+
     for r in traj_iterator:
         # break animation loop if not InAnimation (this is where pause animation takes place):
         EA = FreeCAD.ActiveDocument.ExplodedAssembly
@@ -405,8 +405,9 @@ def runAnimation(start=0, end=0, mode='complete', direction='forward'):
 
 
                 # Inclusion to connects with Movie Camera module
-                if MC_presence == True:
-                    co.connectionEA()             
+                if MC_CONNECTION == True:
+                    import MovieConnection as co
+                    co.connectionEA()
                 # End of inclusion 
 
                 FreeCAD.Gui.updateGui()
