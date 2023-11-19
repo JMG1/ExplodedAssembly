@@ -78,9 +78,9 @@ def checkDocumentStructure():
 class BoltGroupObject:
     def __init__(self, obj):
         obj.addProperty('App::PropertyPythonObject', 'names').names = []
-        obj.addProperty('App::PropertyPythonObject', 'dir_vectors').dir_vectors = []
-        obj.addProperty('App::PropertyPythonObject', 'rot_vectors').rot_vectors = []
-        obj.addProperty('App::PropertyPythonObject', 'rot_centers').rot_centers = []
+        obj.addProperty('App::PropertyVectorList', 'dir_vectors').dir_vectors = []
+        obj.addProperty('App::PropertyVectorList', 'rot_vectors').rot_vectors = []
+        obj.addProperty('App::PropertyVectorList', 'rot_centers').rot_centers = []
         #
         obj.addProperty('App::PropertyFloat', 'Distance').Distance = 20.0
         obj.addProperty('App::PropertyFloat', 'Revolutions').Revolutions = 0.0
@@ -119,7 +119,6 @@ def createBoltDisassemble():
             try:
                 dir_vector = subObject.normalAt(0, 0)
                 break
-
             except:
                 pass
 
@@ -129,16 +128,12 @@ def createBoltDisassemble():
                 if str(subObject.Curve)[0:6] == 'Circle':
                     # append object name
                     SDObj.names.append(sel_obj.Object.Name)
-                    # append unmount direction
-                    JSON_dir_vector = (dir_vector[0], dir_vector[1], dir_vector[2])
-                    SDObj.dir_vectors.append(JSON_dir_vector)
-                    # apend rotation axis
-                    JSON_rot_axis = (dir_vector[0], dir_vector[1], dir_vector[2])
-                    SDObj.rot_vectors.append(JSON_rot_axis)
-                    # append rotation center
-                    rot_center = subObject.Curve.Center
-                    JSON_rot_center = (rot_center[0], rot_center[1], rot_center[2])
-                    SDObj.rot_centers.append(JSON_rot_center)
+                    # append unmount direction                    
+                    SDObj.dir_vectors += [(dir_vector[0], dir_vector[1], dir_vector[2])]
+                    # apend rotation axis                    
+                    SDObj.rot_vectors += [(dir_vector[0], dir_vector[1], dir_vector[2])]
+                    # append rotation center                                        
+                    SDObj.rot_centers += [subObject.Curve.Center]
                     # append initial values for distance, revs, steps
                     SDObj.distance.append(10.0)
                     SDObj.revolutions.append(0)
@@ -174,9 +169,9 @@ def createBoltDisassemble():
 class SimpleGroupObject:
     def __init__(self, obj):
         obj.addProperty('App::PropertyPythonObject', 'names').names = []
-        obj.addProperty('App::PropertyPythonObject', 'dir_vectors').dir_vectors = []
-        obj.addProperty('App::PropertyPythonObject', 'rot_vectors').rot_vectors = []
-        obj.addProperty('App::PropertyPythonObject', 'rot_centers').rot_centers = []
+        obj.addProperty('App::PropertyVectorList', 'dir_vectors').dir_vectors = []
+        obj.addProperty('App::PropertyVectorList', 'rot_vectors').rot_vectors = []
+        obj.addProperty('App::PropertyVectorList', 'rot_centers').rot_centers = []
         #
         obj.addProperty('App::PropertyFloat', 'Distance').Distance = 20.0
         obj.addProperty('App::PropertyFloat', 'Revolutions').Revolutions = 0.0
@@ -212,25 +207,23 @@ def createSimpleDisassemble():
     # the last face of the last object selected determines the disassemble dir vector
     dir_vector = selection[-1].SubObjects[-1].normalAt(0, 0)
     # the rotation center is the center of mass of the last face selected
-    rot_center = selection[-1].SubObjects[-1].CenterOfMass
-    
+    rot_center = selection[-1].SubObjects[-1].CenterOfMass    
     # ignore last object if it cannot be moved, it is only used for positioning
     if FreeCAD.ActiveDocument.getObject(selection[-1].Object.Name) is None:
-        del selection[-1]
-    
+        del selection[-1]            
     # create trajectory data
-    for sel_obj in selection:
-        # append object name
-        SDObj.names.append(sel_obj.Object.Name)
-        # append unmount direction
-        JSON_dir_vector = (dir_vector[0], dir_vector[1], dir_vector[2])
-        SDObj.dir_vectors.append(JSON_dir_vector)
+    obj_selection = FreeCAD.Gui.Selection.getSelection()
+    for i, sel_obj in enumerate(obj_selection):
+        if len(obj_selection) > 1 and i == ( len(obj_selection)-1 ):
+            # last object only serves as reference
+            break        
+        SDObj.names.append(sel_obj.Name)
+        # append unmount direction        
+        SDObj.dir_vectors += [(dir_vector[0], dir_vector[1], dir_vector[2])]
         # apend rotation axis
-        JSON_rot_axis = (dir_vector[0], dir_vector[1], dir_vector[2])
-        SDObj.rot_vectors.append(JSON_rot_axis)
+        SDObj.rot_vectors += [(dir_vector[0], dir_vector[1], dir_vector[2])]
         # append rotation center
-        JSON_rot_center = (rot_center[0], rot_center[1], rot_center[2])
-        SDObj.rot_centers.append(JSON_rot_center)
+        SDObj.rot_centers += [(rot_center[0], rot_center[1], rot_center[2])]
 
     EAFolder = FreeCAD.ActiveDocument.ExplodedAssembly
     # add initial placement if this is the first move of the parts
@@ -452,24 +445,13 @@ def goToEnd():
 
         inc_D = traj.Distance / float(1)
         inc_R = traj.Revolutions / float(1)
-        for i in range(1):
-            if i == 0:
-                dir_vectors = []
-                rot_vectors = []
-                rot_centers = []
-                for s in range(len(objects)):
-                    dir_vectors.append(FreeCAD.Vector(tuple(traj.dir_vectors[s])))
-                    rot_vectors.append(FreeCAD.Vector(tuple(traj.rot_vectors[s])))
-                    rot_centers.append(FreeCAD.Vector(tuple(traj.rot_centers[s])))
-
-            for n in range(len(objects)):
-                obj = objects[n]
-                obj_base = dir_vectors[n]*inc_D
-                obj_rot = FreeCAD.Rotation(rot_vectors[n], inc_R*360)
-                obj_rot_center = rot_centers[n]
-                incremental_placement = FreeCAD.Placement(obj_base, obj_rot, obj_rot_center)
-                obj.Placement = incremental_placement.multiply(obj.Placement)
-
+        for n in range(len(objects)):
+            obj = objects[n]
+            obj_base = traj.dir_vectors[n]*inc_D
+            obj_rot = FreeCAD.Rotation(traj.rot_vectors[n], inc_R*360)
+            obj_rot_center = traj.rot_centers[n]
+            incremental_placement = FreeCAD.Placement(obj_base, obj_rot, obj_rot_center)
+            obj.Placement = incremental_placement.multiply(obj.Placement)
 
     FreeCAD.Gui.updateGui()
 
@@ -613,6 +595,8 @@ def modifyIndividualObjectTrajectory():
 
 
 def updateTrajectoryLines():
+    # this is disabled because is no longer accurate and needs conversion to new placement
+    return
     EAFolder = FreeCAD.ActiveDocument.ExplodedAssembly.Group
     # remove all the previous trajectory lines
     for traj in EAFolder:

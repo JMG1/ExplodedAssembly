@@ -37,14 +37,36 @@ Instructions for Ubuntu & Mint specifically but can be adapted to other distros.
 Then  
 - Relaunch FreeCAD (workbench should be incorporated automagically).
 
-### Usage
+### Basic usage
 
+#### Run example file
 1. Check the provided 'example.fcstd'.  
-2. Load the workbench and then click on "Load Example File" inside the workbench commands tab:
+2. Load the workbench and then click on "Load Example File" inside the workbench drowpdown menu.
 
 ![example file](https://cloud.githubusercontent.com/assets/4140247/26527781/1ea3f7ba-4369-11e7-90cb-2c85a09e878f.PNG)
 
 Watch the [Exploded Assembly workflow screencast](https://www.youtube.com/watch?v=t72qdG772Q8&feature=youtu.be). 
+
+#### Create Simple Group
+#### To explode a single object:
+1. Select the objects you want to explode
+2. If the selected object is of type "Body", the selected face will be used as a normal 
+3. If you want to explode an object of type "Part" (contains other objects), select the Part object and then a face to be used as normal vector.
+4. Several parameters can be modified at the properties of the single group (direction, speed, rotation...)
+
+##### To explode several objects 
+1. Select the objects you want to explode  in the same direction (type of objects allowed are Body and Part)
+2. Select one face to use its normal as direction
+3. Press the icon **Create Simple Group**
+4. You can change the direction vectors and other parameters at the properties of the single group
+
+#### Create Bolt Group
+Bolt groups allow to rotate several screws/nuts/bolts around its own axis while moving. To create a Bolt Group:
+1. Select one circular edge of each the bolts you want to animate
+2. Select one face (arbitrary shape) wich has as normal vector in the direction in wich you want to move the selected bolts
+3. Press the icon **Create Bolt Group**
+4. You can change the direction vectors and other parameters at the properties of the single group
+
 
 ### Documentation
 Wiki documentation will be available soon.
