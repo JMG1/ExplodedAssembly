@@ -75,10 +75,7 @@ Wiki documentation will be available soon.
 For bugs please open a ticket in the [issue queue](https://github.com/JMG1/ExplodedAssembly/issues). For discussion please use the [dedicated Exploded Assembly thread](https://forum.freecadweb.org/viewtopic.php?f=24&t=9028) in the FreeCAD forums.
 
 #### License 
-GPLv2.0
-
-#### Author
-Javier Martínez @JMG1
+LGPLv2.1
 
 
 
