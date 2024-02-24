@@ -595,39 +595,43 @@ def modifyIndividualObjectTrajectory():
 
 
 def updateTrajectoryLines():
-    # this is disabled because is no longer accurate and needs conversion to new placement
-    return
-    EAFolder = FreeCAD.ActiveDocument.ExplodedAssembly.Group
-    # remove all the previous trajectory lines
-    for traj in EAFolder:
-        for lines in traj.Group:
-            FreeCAD.ActiveDocument.removeObject(lines.Name)
+    # TODO this is disabled because is no longer accurate and needs conversion to new placement
+    # goes to a try/except until solved
+    #return
+    try:
+        EAFolder = FreeCAD.ActiveDocument.ExplodedAssembly.Group
+        # remove all the previous trajectory lines
+        for traj in EAFolder:
+            for lines in traj.Group:
+                FreeCAD.ActiveDocument.removeObject(lines.Name)
 
-    # re-draw all trajectories
-    for traj in EAFolder:
-        lines_compound = []
-        objects = []
-        for name in traj.names:
-            objects.append(FreeCAD.ActiveDocument.getObject(name))
+        # re-draw all trajectories
+        for traj in EAFolder:
+            lines_compound = []
+            objects = []
+            for name in traj.names:
+                objects.append(FreeCAD.ActiveDocument.getObject(name))
 
-        inc_D = traj.Distance
-        dir_vectors = []
-        rot_centers = []
-        for s in range(len(objects)):
-            dir_vectors.append(FreeCAD.Vector(tuple(traj.dir_vectors[s])))
-            rot_centers.append(FreeCAD.Vector(tuple(traj.rot_centers[s])))
+            inc_D = traj.Distance
+            dir_vectors = []
+            rot_centers = []
+            for s in range(len(objects)):
+                dir_vectors.append(FreeCAD.Vector(tuple(traj.dir_vectors[s])))
+                rot_centers.append(FreeCAD.Vector(tuple(traj.rot_centers[s])))
 
-        for n in range(len(objects)):
-            pa = rot_centers[n]# objects[n].Placement.Base
-            pb = rot_centers[n] + dir_vectors[n]*inc_D
-            lines_compound.append(Part.makeLine(pa, pb))
+            for n in range(len(objects)):
+                pa = rot_centers[n]# objects[n].Placement.Base
+                pb = rot_centers[n] + dir_vectors[n]*inc_D
+                lines_compound.append(Part.makeLine(pa, pb))
 
-        l_obj = FreeCAD.ActiveDocument.addObject('Part::Feature','trajectory_line')
-        l_obj.Shape = Part.makeCompound(lines_compound)
-        l_obj.ViewObject.DrawStyle = "Dashed"
-        l_obj.ViewObject.LineWidth = 1.0
-        traj.addObject(l_obj)
-
+            l_obj = FreeCAD.ActiveDocument.addObject('Part::Feature','trajectory_line')
+            l_obj.Shape = Part.makeCompound(lines_compound)
+            l_obj.ViewObject.DrawStyle = "Dashed"
+            l_obj.ViewObject.LineWidth = 1.0
+            traj.addObject(l_obj)
+    except Exception as e:
+        print("Trajectory Line exception:",e)
+    
     FreeCAD.Gui.updateGui()
 
 
