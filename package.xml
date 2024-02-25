@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>Exploded Assembly</name>
+  <description>FreeCAD workbench to create exploded views and animations of assemblies.</description>
+  <version>0.1</version>
+  <date>2023-12-10</date>
+  <maintainer email="asaber@gmx.com">Javier Martínez</maintainer>
+  <license file="LICENSE">GPLv2+</license>
+  <url type="repository" branch="master">https://github.com/JMG1/ExplodedAssembly</url>
+  <url type="readme">https://github.com/JMG1/ExplodedAssembly/blob/master/README.md</url>
+  <icon>icons/WorkbenchIcon.svg</icon>
+
+  <content>
+    <workbench>
+      <classname>ExplodedAssembly</classname>
+      <subdirectory>./</subdirectory>
+      <tag>assembly</tag>
+    </workbench>
+  </content>
+
+</package>
